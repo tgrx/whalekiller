@@ -3,6 +3,26 @@
 This service provide security checks
 for your cloud VMs.
 
+[![Heroku App Status](http://heroku-shields.herokuapp.com/whalekiller)](https://whalekiller.herokuapp.com)
+![CircleCI](https://img.shields.io/circleci/build/github/tgrx/whalekiller/main)
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/tgrx/whalekiller)
+
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/gunicorn)
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/uvicorn)
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/fastapi)
+
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/tgrx/whalekiller)
+![GitHub repo size](https://img.shields.io/github/repo-size/tgrx/whalekiller)
+![Lines of code](https://img.shields.io/tokei/lines/github/tgrx/whalekiller)
+
+[![GitHub issues](https://img.shields.io/github/issues/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/issues)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/tgrx/whalekiller)
+
+[![GitHub license](https://img.shields.io/github/license/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/blob/main/LICENSE)
+
+
 ## How to use
 
 RTFM
