@@ -1,0 +1,16 @@
+*.secrets.*
+.circleci/
+.git/
+.gitattributes
+.gitignore
+.isort.cfg
+.venv/
+docker-compose.yml
+Dockerfile
+LICENSE
+Procfile
+pytest.ini
+README.md
+runtime.txt
+tests/
+venv/
