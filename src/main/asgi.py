@@ -12,13 +12,13 @@ HTML_CONTENT = """
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Alpha</title>
+        <title>WhaleKiller</title>
         <meta charset="utf-8">
     </head>
     <body>
-        <h1>Project Alpha</h1>
+        <h1>WhaleKiller</h1>
         <hr>
-        <p>This is a template project.</p>
+        <p>This service provide security checks for your cloud VMs.</p>
         <p>
             <h2>Scope</h2>
             <p>{scope}</p>
