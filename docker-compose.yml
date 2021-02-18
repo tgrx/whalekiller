@@ -1,40 +1,40 @@
 version: "3.3"
 services:
-  alpha-web:
+  whalekiller-web:
     build: ./
-    container_name: alpha-web
+    container_name: whalekiller-web
     depends_on:
-      - alpha-db
+      - whalekiller-db
     entrypoint: ["make", "wait-for-db", "run-prod"]
     environment:
-      DATABASE_URL: "postgresql://alpha:alpha@alpha-db:5432/alpha"
+      DATABASE_URL: "postgresql://whalekiller:whalekiller@whalekiller-db:5432/whalekiller"
       PORT: 80
-    image: alpha-web
+    image: whalekiller-web
     ports:
       - "8888:80"
-  alpha-db:
-    container_name: alpha-db
+  whalekiller-db:
+    container_name: whalekiller-db
     environment:
-      POSTGRES_USER: alpha
-      POSTGRES_PASSWORD: alpha
-      POSTGRES_DB: alpha
+      POSTGRES_USER: whalekiller
+      POSTGRES_PASSWORD: whalekiller
+      POSTGRES_DB: whalekiller
     image: postgres:13.1-alpine
     ports:
       - "5555:5432"
     restart: always
     volumes:
-      - alpha-volume:/var/lib/postgresql/data
-  alpha-dba:
-    container_name: alpha-dba
+      - whalekiller-volume:/var/lib/postgresql/data
+  whalekiller-dba:
+    container_name: whalekiller-dba
     image: adminer
     restart: always
     ports:
       - 5556:8080
     volumes:
-      - alpha-volume:/var/lib/postgresql/data
+      - whalekiller-volume:/var/lib/postgresql/data
 volumes:
-  alpha-volume:
-    name: alpha-volume
+  whalekiller-volume:
+    name: whalekiller-volume
     driver: local
     driver_opts:
       type: tmpfs
