@@ -14,16 +14,19 @@ isort = "==5.7.0"
 jedi = "==0.17.2"
 pudb = "==2020.1"
 pytest = "==6.2.2"
+pytest-asyncio = "==0.14.0"
 pytest-mock = "==3.5.1"
 pytest-selenium = "==2.0.1"
 
 [packages]
+asyncpg = "==0.22.0"
 fastapi = "==0.63.0"
 gunicorn = "==20.0.4"
 psycopg2-binary = "==2.8.6"
 pydantic = "==1.7.3"
 requests = "==2.25.1"
 sentry-sdk = "==0.20.3"
+sqlalchemy = "==1.4.0b3"
 toml = "==0.10.2"
 
 [packages.dynaconf]

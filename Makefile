@@ -20,3 +20,8 @@ include ./Makefile.targets.mk
 # ---------------------------------------------------------
 # [  TARGETS  ]
 # keep your targets here
+
+.PHONY: migrate
+migrate::
+	$(MANAGEMENT) migrations --apply
+
