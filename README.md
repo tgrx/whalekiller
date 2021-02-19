@@ -4,23 +4,27 @@ This service provide security checks
 for your cloud VMs.
 
 [![Heroku App Status](http://heroku-shields.herokuapp.com/whalekiller)](https://whalekiller.herokuapp.com)
-![CircleCI](https://img.shields.io/circleci/build/github/tgrx/whalekiller/main)
+[![CircleCI](https://circleci.com/gh/tgrx/whalekiller.svg?style=shield)](https://app.circleci.com/pipelines/github/tgrx/whalekiller?branch=main)
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/tgrx/whalekiller)
+[![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/gunicorn)
-![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/uvicorn)
-![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/fastapi)
+[![python](https://img.shields.io/github/pipenv/locked/python-version/tgrx/whalekiller)](Pipfile)
+[![docker-compose](https://img.shields.io/badge/docker--compose-3.3-blue)](https://docs.docker.com/compose/)
+[![gunicorn](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/gunicorn)](https://gunicorn.org/)
+[![uvicorn](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/uvicorn)](https://www.uvicorn.org/)
+[![fastapi](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/fastapi)](https://fastapi.tiangolo.com/)
+[![dynaconf](https://img.shields.io/github/pipenv/locked/dependency-version/tgrx/whalekiller/dynaconf)](https://www.dynaconf.com/)
+[![postgresql](https://img.shields.io/badge/PostgreSQL-13.1-blue)](https://postgresql.org)
 
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/tgrx/whalekiller)
-![GitHub repo size](https://img.shields.io/github/repo-size/tgrx/whalekiller)
-![Lines of code](https://img.shields.io/tokei/lines/github/tgrx/whalekiller)
 
-[![GitHub issues](https://img.shields.io/github/issues/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/issues)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/tgrx/whalekiller)
+[![code size](https://img.shields.io/github/languages/code-size/tgrx/whalekiller)](./)
+[![repo size](https://img.shields.io/github/repo-size/tgrx/whalekiller)](./)
+[![loc](https://img.shields.io/tokei/lines/github/tgrx/whalekiller)](./)
 
-[![GitHub license](https://img.shields.io/github/license/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/blob/main/LICENSE)
+[![issues](https://img.shields.io/github/issues/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/issues)
+[![pull requests](https://img.shields.io/github/issues-pr/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/pulls)
+
+[![license](https://img.shields.io/github/license/tgrx/whalekiller)](https://github.com/tgrx/whalekiller/blob/main/LICENSE)
 
 
 ## How to use
