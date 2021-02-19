@@ -19,7 +19,7 @@ _engine = create_engine(settings.DATABASE_URL)
 
 engine = create_async_engine(
     async_database_url,
-    echo=True,
+    echo=settings.MODE_DEBUG,
 )
 
 Base = declarative_base()
