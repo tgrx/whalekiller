@@ -1,11 +1,11 @@
 .PHONY: run
-run:
+run::
 	$(call log, starting application)
 	$(ENTRYPOINT)
 
 
 .PHONY: run-dev
-run-dev:
+run-dev::
 	$(call log, starting development web server)
 	$(RUN) uvicorn \
 		--host 0.0.0.0 \
@@ -19,13 +19,13 @@ run-dev:
 
 
 .PHONY: run-prod
-run-prod:
+run-prod::
 	$(call log, starting production web server)
 	$(RUN) gunicorn --config="$(DIR_CONFIG)/gunicorn.conf.py" $(APPLICATION)
 
 
 .PHONY: format
-format:
+format::
 	$(call log, reorganizing imports & formatting code)
 	$(RUN) isort --virtual-env="$(DIR_VENV)" \
 		"$(DIR_SRC)" \
@@ -42,7 +42,7 @@ format:
 
 
 .PHONY: test
-test:
+test::
 	$(call log, running tests)
 	$(RUN) pytest
 	$(RUN) isort --virtual-env="$(DIR_VENV)" --check-only \
@@ -60,59 +60,59 @@ test:
 
 
 .PHONY: release
-release: db data
+release:: db data
 	$(call log, performing release steps)
 
 
 .PHONY: sh
-sh:
+sh::
 	$(call log, starting Python shell)
 	$(RUN) ipython
 
 
 .PHONY: venv-dir
-venv-dir:
+venv-dir::
 	$(call log, initializing venv directory)
 	test -d .venv || mkdir .venv
 
 
 .PHONY: venv
-venv: venv-dir
+venv:: venv-dir
 	$(call log, installing packages)
 	$(PIPENV_INSTALL)
 
 
 .PHONY: venv-dev
-venv-dev: venv-dir
+venv-dev:: venv-dir
 	$(call log, installing development packages)
 	$(PIPENV_INSTALL) --dev
 
 
 .PHONY: venv-prod
-venv-prod: venv-dir
+venv-prod:: venv-dir
 	$(call log, installing development packages for production)
 	$(PIPENV_INSTALL) --deploy
 
 
 .PHONY: upgrade-venv
-upgrade-venv: venv-dir
+upgrade-venv:: venv-dir
 	$(call log, upgrading all packages in virtualenv)
 	$(MANAGEMENT) upgrade-packages
 
 
 .PHONY: heroku
-heroku:
+heroku::
 	$(call log, configuring the Heroku instance)
 	$(MANAGEMENT) heroku --configure
 
 
 .PHONY: db
-db: migrate
+db:: migrate
 	$(call log, setting DB up)
 
 
 .PHONY: wait-for-db
-wait-for-db:
+wait-for-db::
 	$(call log, waiting for DB up)
 	$(DIR_SCRIPTS)/wait_for_postgresql.sh \
 		$(shell $(MANAGEMENT) db-config --host) \
@@ -121,17 +121,17 @@ wait-for-db:
 
 
 .PHONY: initdb
-initdb: resetdb migrate
+initdb:: resetdb migrate
 	$(call log, initializing the DB)
 
 
 .PHONY: resetdb
-resetdb:  dropdb createdb
+resetdb::  dropdb createdb
 	$(call log, resetting DB to initial state)
 
 
 .PHONY: dropdb
-dropdb:
+dropdb::
 	$(call log, dropping the DB)
 	dropdb \
 		--echo \
@@ -144,7 +144,7 @@ dropdb:
 
 
 .PHONY: createdb
-createdb:
+createdb::
 	$(call log, creating the DB)
 	createdb \
 		--echo \
@@ -157,37 +157,37 @@ createdb:
 
 
 .PHONY: migrations
-migrations:
+migrations::
 	$(call log, generating migrations)
 
 
 .PHONY: migrate
-migrate:
+migrate::
 	$(call log, applying migrations)
 
 
 .PHONY: data
-data: static
+data:: static
 	$(call log, preparing data)
 
 
 .PHONY: static
-static:
+static::
 	$(call log, collecting static)
 
 
 .PHONY: docker
-docker:
+docker::
 	docker-compose build
 
 
 .PHONY: docker-run
-docker-run:
+docker-run::
 	docker-compose up
 
 
 .PHONY: docker-clean
-docker-clean:
+docker-clean::
 	docker-compose stop || true
 	docker-compose down || true
 	docker-compose rm --force || true

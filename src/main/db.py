@@ -1,7 +1,5 @@
-import asyncio
 import contextlib
 
-import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -14,8 +12,14 @@ from framework.config import settings
 Base = declarative_base()
 
 _engine = create_engine(settings.DATABASE_URL)
+
+async_database_url = settings.DATABASE_URL.replace(
+    "postgresql://",
+    "postgresql+asyncpg://",
+)
+
 engine = create_async_engine(
-    settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
+    async_database_url,
     echo=True,
 )
 
@@ -51,16 +55,3 @@ class Migration(Reflected, Base):
 
 
 Reflected.prepare(_engine)
-
-
-async def async_main():
-    async with begin_session() as session:
-        stmt = sa.select(Migration)
-
-        result = await session.execute(stmt)
-        for migration in result.scalars():
-            print(migration.version, migration.applied_at)
-
-
-if __name__ == "__main__":
-    asyncio.run(async_main())

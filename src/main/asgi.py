@@ -1,12 +1,14 @@
 from typing import Callable
 from typing import Dict
 
-import sentry_sdk
+import sqlalchemy as sa
 
-from framework.config import settings
+from framework import monitoring
 from framework.logging import get_logger
+from main.db import begin_session
+from main.db import Migration
 
-sentry_sdk.init(settings.SENTRY_DSN, traces_sample_rate=1.0)
+monitoring.configure()
 
 HTML_CONTENT = """
 <!DOCTYPE html>
@@ -16,17 +18,23 @@ HTML_CONTENT = """
         <meta charset="utf-8">
     </head>
     <body>
-        <h1>WhaleKiller</h1>
-        <hr>
-        <p>This service provide security checks for your cloud VMs.</p>
-        <p>
-            <h2>Scope</h2>
-            <p>{scope}</p>
-        </p>
-        <p>
-            <h2>Request</h2>
-            <p>{request}</p>
-        </p>
+        <article>
+            <h1>WhaleKiller</h1>
+            <hr>
+            <p>This service provide security checks for your cloud VMs.</p>
+            <section>
+                <h2>Scope</h2>
+                <p>{scope}</p>
+            </section>
+            <section>
+                <h2>Request</h2>
+                <p>{request}</p>
+            </section>
+            <section>
+                <h2>Migrations</h2>
+                <table style="border: 0">{migrations}</table>
+            </section>
+        </article>
     </body>
 </html>
 """
@@ -55,7 +63,21 @@ async def application(scope: Dict, receive: Callable, send: Callable):
         }
     )
 
-    payload = HTML_CONTENT.format(request=request, scope=scope)
+    async with begin_session() as session:
+        stmt = sa.select(Migration)
+
+        result = await session.execute(stmt)
+
+        migrations = "".join(
+            f"<tr><td>{m.version}</td><td>{m.applied_at.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
+            for m in result.scalars()
+        )
+
+    payload = HTML_CONTENT.format(
+        request=request,
+        scope=scope,
+        migrations=migrations,
+    )
 
     await send(
         {
