@@ -5,19 +5,21 @@
 """
 Exits with 1 when called within active Python virtualenv
 """
-
+import os
 import sys
 
 
 def in_virtualenv():
     try:
-        from framework.config import VENV_SYNTHETIC
-    except ImportError:
-        VENV_SYNTHETIC = False
+        from framework.config import settings
 
-    synth_venv = VENV_SYNTHETIC
+        synth_venv = settings.VENV_SYNTHETIC
+    except ImportError:
+        env_value = os.getenv("VENV_SYNTHETIC", "False").capitalize()
+        synth_venv = bool(eval(env_value))
+
     actual_venv = _discover_venv_by_prefix()
-    return synth_venv or actual_venv
+    return bool(synth_venv or actual_venv)
 
 
 def _discover_venv_by_prefix():

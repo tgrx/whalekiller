@@ -4,6 +4,7 @@ default:
   HEROKU_APP_NAME: ""
   HOST: ""
   MODE_DEBUG: true
+  MODE_DEBUG_SQL: false
   MODE_PROFILING: false
   PORT: -1
   REQUEST_TIMEOUT: 0
@@ -33,7 +34,7 @@ ci:
 heroku:
   MODE_DEBUG: false
   REQUEST_TIMEOUT: 10
-  VENV_SYNTHETIC: 1
+  VENV_SYNTHETIC: true
 
 
 docker:

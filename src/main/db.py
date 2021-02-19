@@ -1,6 +1,5 @@
 import contextlib
 
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import DeferredReflection
@@ -9,21 +8,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
 from framework.config import settings
-
-async_database_url = settings.DATABASE_URL.replace(
-    "postgresql://",
-    "postgresql+asyncpg://",
-)
-
-_engine = create_engine(settings.DATABASE_URL)
+from main.db_util import run_sync
+from main.db_util import with_driver
 
 engine = create_async_engine(
-    async_database_url,
-    echo=settings.MODE_DEBUG,
+    with_driver("asyncpg"),
+    echo=settings.MODE_DEBUG_SQL,
 )
 
 Base = declarative_base()
-Base.metadata.reflect(bind=_engine)
+
+run_sync(Base.metadata.reflect, engine)
 
 Session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
@@ -70,4 +65,4 @@ class FirewallRule(Reflected, Base):
     )
 
 
-Reflected.prepare(_engine)
+run_sync(Reflected.prepare, engine)

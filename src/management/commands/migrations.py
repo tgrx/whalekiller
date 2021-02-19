@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import json
 from pathlib import Path
 from typing import Generator
@@ -28,14 +29,36 @@ class MigrationsCommand(ManagementCommand):
         if not url:
             raise RuntimeError("database is not configured")
 
+        loop = asyncio.get_event_loop()
+
         if self.option_is_active("--apply"):
-            asyncio.run(self.apply_migrations())
+            task = self.apply_migrations()
         else:
-            asyncio.run(self.display_applied_versions())
+            task = self.display_applied_versions()
+
+        loop.run_until_complete(task)
+
+    @staticmethod
+    @contextlib.asynccontextmanager
+    async def db_connect(txn=False):
+        conn: Connection = await asyncpg.connect(
+            command_timeout=30,  # FIXME: magic
+            dsn=settings.DATABASE_URL,
+            ssl="prefer",
+            timeout=30,  # FIXME: magic
+        )
+
+        try:
+            if txn:
+                async with conn.transaction():
+                    yield conn
+            else:
+                yield conn
+        finally:
+            await conn.close(timeout=30)  # FIXME: magic
 
     async def display_applied_versions(self) -> None:
-        conn: Connection = await asyncpg.connect(settings.DATABASE_URL)
-        async with conn.transaction():
+        async with self.db_connect(txn=True) as conn:
             result = {
                 version: DIR_MIGRATIONS / version
                 for version in await self.fetch_applied_versions(conn)
@@ -49,23 +72,25 @@ class MigrationsCommand(ManagementCommand):
         print(json.dumps(result, sort_keys=True, indent=2))
 
     async def apply_migrations(self) -> None:
-        conn: Connection = await asyncpg.connect(settings.DATABASE_URL)
-        async with conn.transaction():
-            applied_versions = await self.fetch_applied_versions(conn)
+        async with self.db_connect() as conn:
+            async with conn.transaction():
+                applied_versions = await self.fetch_applied_versions(conn)
 
-        async with conn.transaction():
-            for migration in self.list_migrations_paths():
-                if migration.name in applied_versions:
-                    print(f"\N{HEAVY CHECK MARK}\N{VARIATION SELECTOR-16}\t{migration}")
-                    continue
+            async with conn.transaction():
+                for migration in self.list_migrations_paths():
+                    if migration.name in applied_versions:
+                        print(
+                            f"\N{HEAVY CHECK MARK}\N{VARIATION SELECTOR-16}\t{migration}"
+                        )
+                        continue
 
-                try:
-                    await self.apply_single_migration(migration, conn)
-                except Exception:
-                    print(f"\N{CROSS MARK}\t{migration}")
-                    raise
-                else:
-                    print(f"\N{WHITE HEAVY CHECK MARK}\t{migration}")
+                    try:
+                        await self.apply_single_migration(migration, conn)
+                    except Exception:
+                        print(f"\N{CROSS MARK}\t{migration}")
+                        raise
+                    else:
+                        print(f"\N{WHITE HEAVY CHECK MARK}\t{migration}")
 
     @staticmethod
     async def apply_single_migration(migration, conn) -> None:
@@ -82,7 +107,7 @@ class MigrationsCommand(ManagementCommand):
 
     @staticmethod
     def list_migrations_paths() -> Generator[Path, None, None]:
-        for path in DIR_MIGRATIONS.glob("*.sql"):
+        for path in sorted(DIR_MIGRATIONS.glob("*.sql")):
             yield path
 
     @staticmethod
@@ -99,16 +124,3 @@ class MigrationsCommand(ManagementCommand):
                 raise
 
         return versions
-
-
-if __name__ == "__main__":
-    C = MigrationsCommand(None)
-
-    async def x():
-        r = []
-        async for I in C.list_all_migrations():
-            r.append(I)
-        return r
-
-    R = asyncio.run(x())
-    print(R)
