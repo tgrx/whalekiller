@@ -5,8 +5,8 @@ import sqlalchemy as sa
 
 from framework import monitoring
 from framework.logging import get_logger
-from main.db import begin_session
-from main.db import Migration
+from main.db.models import Migration
+from main.db.sessions import begin_session
 
 monitoring.configure()
 

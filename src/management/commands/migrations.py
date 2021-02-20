@@ -29,14 +29,12 @@ class MigrationsCommand(ManagementCommand):
         if not url:
             raise RuntimeError("database is not configured")
 
-        loop = asyncio.get_event_loop()
-
         if self.option_is_active("--apply"):
             task = self.apply_migrations()
         else:
             task = self.display_applied_versions()
 
-        loop.run_until_complete(task)
+        asyncio.run(task)
 
     @staticmethod
     @contextlib.asynccontextmanager

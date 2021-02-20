@@ -14,6 +14,7 @@ run-dev::
 		--loop $(UVICORN_LOOP_ENGINE) \
 		--port 8000 \
 		--reload \
+		--reload-dir $(DIR_SRC) \
 		--workers 1 \
 		--ws none \
 		$(APPLICATION)
