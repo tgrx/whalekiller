@@ -1,89 +1,48 @@
-from typing import Callable
-from typing import Dict
-
-import sqlalchemy as sa
+from fastapi import FastAPI
+from sqlalchemy import select
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
+from starlette.templating import Jinja2Templates
 
 from framework import monitoring
+from framework.dirs import DIR_TEMPLATES
 from framework.logging import get_logger
 from main.db.models import Migration
 from main.db.sessions import begin_session
+from main.urls import PATH_DOCS
+from main.urls import PATH_ROOT
 
 monitoring.configure()
 
-HTML_CONTENT = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>WhaleKiller</title>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <article>
-            <h1>WhaleKiller</h1>
-            <hr>
-            <p>This service provide security checks for your cloud VMs.</p>
-            <section>
-                <h2>Scope</h2>
-                <p>{scope}</p>
-            </section>
-            <section>
-                <h2>Request</h2>
-                <p>{request}</p>
-            </section>
-            <section>
-                <h2>Migrations</h2>
-                <table style="border: 0">{migrations}</table>
-            </section>
-        </article>
-    </body>
-</html>
-"""
-
 logger = get_logger("asgi")
 
+app = FastAPI(
+    description="Cloud monitoring and attack analysis",
+    docs_url=f"{PATH_DOCS}/",
+    openapi_url=f"{PATH_DOCS}/openapi.json",
+    redoc_url=f"{PATH_DOCS}/redoc/",
+    title="WhaleKiller API",
+    version="1.0.0",
+)
 
-async def application(scope: Dict, receive: Callable, send: Callable):
-    path = scope["path"]
-    logger.debug(f"path: {path}")
+templates = Jinja2Templates(directory=DIR_TEMPLATES)
 
-    if path.startswith("/e"):
-        logger.debug(f"here goes an error ...")
-        print(1 / 0)
 
-    request = await receive()
-    logger.debug(f"request: {request}")
-
-    await send(
-        {
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [
-                [b"content-type", b"text/html"],
-            ],
-        }
-    )
+@app.get(f"{PATH_ROOT}/", response_class=HTMLResponse)
+async def index(request: Request) -> templates.TemplateResponse:
+    logger.debug("handling index")
 
     async with begin_session() as session:
-        stmt = sa.select(Migration)
+        stmt = select(Migration)
 
         result = await session.execute(stmt)
 
-        migrations = "".join(
-            f"<tr><td>{m.version}</td><td>{m.applied_at.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
-            for m in result.scalars()
-        )
+        migrations = result.scalars()
 
-    payload = HTML_CONTENT.format(
-        request=request,
-        scope=scope,
-        migrations=migrations,
-    )
+    context = {
+        "migrations": migrations,
+    }
 
-    await send(
-        {
-            "type": "http.response.body",
-            "body": payload.encode(),
-        }
-    )
+    response = templates.TemplateResponse("index.html", {"request": request, **context})
 
-    logger.debug(f"response has been sent")
+    return response

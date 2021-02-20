@@ -5,7 +5,7 @@ from uvicorn import Server
 
 from framework.config import settings
 from framework.logging import get_logger
-from main.asgi import application
+from main.asgi import app
 
 SERVER_RUNNING_BANNER = """
 +----------------------------------------+
@@ -26,9 +26,7 @@ def build_runner():
         logger.info(banner)
 
         try:
-            config = Config(
-                app=application, host="0.0.0.0", port=settings.PORT
-            )  # , loop=loop)
+            config = Config(app=app, host="0.0.0.0", port=settings.PORT)
             server = Server(config)
             await server.serve()
         except KeyboardInterrupt:
