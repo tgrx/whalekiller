@@ -31,7 +31,11 @@ DIR_VENV := $(shell $(PIPENV) --venv 2>/dev/null)
 
 ifeq ($(OS), Windows_NT)
 
+UVICORN_LOOP_ENGINE := asyncio
+
 else
+
+UVICORN_LOOP_ENGINE := uvloop
 
 endif
 

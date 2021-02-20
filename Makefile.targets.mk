@@ -11,6 +11,7 @@ run-dev::
 		--host 0.0.0.0 \
 		--lifespan off \
 		--log-level debug \
+		--loop $(UVICORN_LOOP_ENGINE) \
 		--port 8000 \
 		--reload \
 		--workers 1 \

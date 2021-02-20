@@ -1,4 +1,7 @@
-import uvicorn
+import asyncio
+
+from uvicorn import Config
+from uvicorn import Server
 
 from framework.config import settings
 from framework.logging import get_logger
@@ -15,6 +18,7 @@ Visit http://{host}:{port}
 """
 
 logger = get_logger("app")
+loop = asyncio.get_event_loop()
 
 
 def run():
@@ -22,7 +26,9 @@ def run():
     logger.info(banner)
 
     try:
-        uvicorn.run(application, host="0.0.0.0", port=settings.PORT)
+        config = Config(app=application, host="0.0.0.0", port=settings.PORT, loop=loop)
+        server = Server(config)
+        loop.run_until_complete(server.serve())
     except KeyboardInterrupt:
         logger.debug("stopping server")
     finally:
