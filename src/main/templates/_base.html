@@ -42,8 +42,8 @@
         }
 
         .bg-ambi {
-            background: #ff8c00;
-            color: #414141;
+            background: #5d2800;
+            color: #fcfcfc;
         }
 
     </style>
@@ -68,9 +68,41 @@
         </div>
     </div>
 </nav>
-<div class="container">
+<div class="container mt-4">
     {% block body %}
     {% endblock %}
 </div>
+<script>
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function copyToClipboard(element) {
+        const tc = element.textContent;
+
+        element.textContent = "  📋  ";
+
+        try {
+            const buffer = document.createElement("textarea");
+            buffer.value = tc;
+            document.body.appendChild(buffer);
+            buffer.select();
+            buffer.setSelectionRange(0, 99999); /* For mobile devices */
+            document.execCommand("Copy");
+            buffer.remove();
+
+            await sleep(500);
+        } finally {
+            element.textContent = tc;
+        }
+    }
+
+    document.addEventListener("click", async function (event) {
+        if (!event.target.classList.contains("ctc")) {
+            return;
+        }
+        await copyToClipboard(event.target);
+    })
+</script>
 </body>
 </html>
