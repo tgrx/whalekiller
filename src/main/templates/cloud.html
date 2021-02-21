@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+{% block title %}Cloud{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm">
+            <section>
+                <h2>Cloud</h2>
+                <section>
+                    <h3>Virtual Machines</h3>
+                    {% for vm in vms %}
+                        <ul>
+                            <li>PK: {{ vm.vm_pk }}</li>
+                            <li>ID: {{ vm.vm_id }}</li>
+                            <li>NAME: {{ vm.name }}</li>
+                            <ul>
+                                {% for t in vm.tags %}
+                                    <li>{{ t.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </ul>
+                    {% endfor %}
+                </section>
+                <section>
+                    <h3>Firewall</h3>
+                    {% for r in fwr %}
+                        <ul>
+                            <li>PK: {{ r.fw_pk }}</li>
+                            <li>ID: {{ r.fw_id }}</li>
+                            <li>{{ r.source.name }} -> {{ r.dest.name }}</li>
+                        </ul>
+                    {% endfor %}
+                </section>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <section>
+                <h2>Cloud config</h2>
+                <form action="{{ url_for('setup-cloud') }}" enctype="multipart/form-data" method="post">
+                    <div>
+                        <label for="id_config_input">JSON config:</label>
+                        <input id="id_config_input" name="config" type="file">
+                    </div>
+                    <div>
+                        <label for="id_admin_password">Password:</label>
+                        <input id="id_admin_password" name="password" type="password">
+                    </div>
+                    <div>
+                        <button type="submit">Set up</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+{% endblock %}
