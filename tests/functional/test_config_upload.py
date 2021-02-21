@@ -28,7 +28,7 @@ async def test(browser, request, service_url, empty_cloud):
     config = CloudConfigSchema.parse_file(path_to_file)
 
     page.config.send_keys(path_to_file)
-    page.password.send_keys("14881488")
+    page.password.send_keys("1")
 
     page.create_cloud.click()
 
