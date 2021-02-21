@@ -49,20 +49,20 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" id="id_nav">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">WHALEKILLER</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#id_nav_items" aria-controls="id_nav_items"
                 aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="id_nav_items">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link {{ request.path == url('index') and 'active' }}" aria-current="page" href="{{ url('index') }}">Home</a>
+                    <a aria-current="page" class="nav-link {{ request.path == url('index') and 'active' }}" href="{{ url('index') }}" id="id_nav_item_home">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request.path == url('cloud') and 'active' }}" aria-current="page" href="{{ url('cloud') }}">Cloud</a>
+                    <a aria-current="page" class="nav-link {{ request.path == url('cloud') and 'active' }}" href="{{ url('cloud') }}" id="id_nav_item_cloud">Cloud</a>
                 </li>
             </ul>
         </div>
@@ -80,7 +80,7 @@
     async function copyToClipboard(element) {
         const tc = element.textContent;
 
-        element.textContent = "  📋  ";
+        element.textContent = "👉 📋";
 
         try {
             const buffer = document.createElement("textarea");
@@ -95,6 +95,8 @@
         } finally {
             element.textContent = tc;
         }
+
+        element.textContent = tc;
     }
 
     document.addEventListener("click", async function (event) {

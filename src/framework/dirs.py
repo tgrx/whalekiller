@@ -15,6 +15,7 @@ DIR_MAIN = DIR_SRC / "main"
 DIR_SCRIPTS = DIR_REPO / "scripts"
 
 DIR_TESTS = DIR_REPO / "tests"
+DIR_TESTS_ASSETS = DIR_TESTS / "assets"
 
 DIR_TEST_ARTIFACTS = DIR_REPO / ".tests_artifacts"
 DIR_TEST_ARTIFACTS.mkdir(exist_ok=True)
