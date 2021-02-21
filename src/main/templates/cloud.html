@@ -1,56 +1,68 @@
 {% extends "_base.html" %}
 {% block title %}Cloud{% endblock %}
 {% block body %}
-    <div class="row">
-        <div class="col-sm">
-            <section>
-                <h2>Cloud</h2>
-                <section>
-                    <h3>Virtual Machines</h3>
-                    {% for vm in vms %}
-                        <ul>
-                            <li>PK: {{ vm.vm_pk }}</li>
-                            <li>ID: {{ vm.vm_id }}</li>
-                            <li>NAME: {{ vm.name }}</li>
-                            <ul>
-                                {% for t in vm.tags %}
-                                    <li>{{ t.name }}</li>
-                                {% endfor %}
-                            </ul>
-                        </ul>
-                    {% endfor %}
-                </section>
-                <section>
-                    <h3>Firewall</h3>
-                    {% for r in fwr %}
-                        <ul>
-                            <li>PK: {{ r.fw_pk }}</li>
-                            <li>ID: {{ r.fw_id }}</li>
-                            <li>{{ r.source.name }} -> {{ r.dest.name }}</li>
-                        </ul>
-                    {% endfor %}
-                </section>
-            </section>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-            <section>
-                <h2>Cloud config</h2>
-                <form action="{{ url_for('setup-cloud') }}" enctype="multipart/form-data" method="post">
-                    <div>
-                        <label for="id_config_input">JSON config:</label>
-                        <input id="id_config_input" name="config" type="file">
+    <section>
+        <h2>Cloud</h2>
+        <section>
+            <h3>Virtual Machines</h3>
+            <div class="row">
+                {% for obj in vms %}
+                    <div class="col-sm-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ obj.name or 'VM' }}</h5>
+                                <div class="card-text">
+                                    <ul class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ obj.vm_pk }}
+                                            <span class="badge bg-secondary">PK</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ obj.vm_id }}
+                                            <span class="badge bg-secondary">ID</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                {% for t in obj.tags %}
+                                                    <span class="badge bg-ambi rounded-pill">{{ t.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="id_admin_password">Password:</label>
-                        <input id="id_admin_password" name="password" type="password">
+                {% endfor %}
+            </div>
+        </section>
+        <section>
+            <h3>Firewall Rules</h3>
+            <div class="row">
+                {% for obj in fw_rules %}
+                    <div class="col-sm-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ obj.fw_id }}</h5>
+                                <div class="card-text">
+                                    <ul class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ obj.fw_pk }}
+                                            <span class="badge bg-secondary">PK</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="badge bg-success rounded-pill">{{ obj.source.name }}</span>
+                                                <span class="badge bg-danger rounded-pill">{{ obj.dest.name }}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <button type="submit">Set up</button>
-                    </div>
-                </form>
-            </section>
-        </div>
-    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
 {% endblock %}

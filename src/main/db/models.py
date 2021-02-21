@@ -87,6 +87,7 @@ class VirtualMachine(Model):
 
     tags = relationship(
         Tag,
+        order_by=Tag.name,
         secondary=vm_tag,
     )
 

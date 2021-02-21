@@ -41,3 +41,5 @@ def mute_root_logger():
 
 
 mute_root_logger()
+
+logger = get_logger("app")
