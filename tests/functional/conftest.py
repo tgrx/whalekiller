@@ -27,8 +27,6 @@ def service_url():
 
 @pytest.yield_fixture(scope="function", autouse=True)
 async def empty_cloud(event_loop):
-    await reset_cloud()
-
     yield
 
     await reset_cloud()

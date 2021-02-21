@@ -24,7 +24,7 @@ async def test(browser, request, service_url, empty_cloud):
     assert page.config.tag_name == "input"
     assert page.config.get_attribute("type") == "file"
 
-    path_to_file = (DIR_TESTS_ASSETS / "input-0.json").resolve().as_posix()
+    path_to_file = (DIR_TESTS_ASSETS / "input-3.json").resolve().as_posix()
     config = CloudConfigSchema.parse_file(path_to_file)
 
     page.config.send_keys(path_to_file)
@@ -51,5 +51,3 @@ async def test(browser, request, service_url, empty_cloud):
 
     for fw in config.fw_rules:
         assert fw.fw_id in ids_fw, fw
-
-    assert False
