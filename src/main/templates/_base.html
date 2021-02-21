@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Base{% endblock %} :: WhaleKiller</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background: #393939;
+            color: ghostwhite;
+        }
+
+        a {
+            color: #58ff00;
+        }
+
+        a:visited {
+            color: #45cb00;
+        }
+
+        a:hover {
+            color: yellow;
+        }
+
+        a:visited:hover {
+            color: yellow;
+        }
+
+        .card {
+            background: #494949;
+            color: ghostwhite;
+            min-height: 100px;
+        }
+
+        .card .list-group-item {
+            background: #595959;
+            color: ghostwhite;
+        }
+
+        .bg-ambi {
+            background: #5d2800;
+            color: #fcfcfc;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" id="id_nav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">WHALEKILLER</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#id_nav_items" aria-controls="id_nav_items"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="id_nav_items">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link {{ request.path == url('index') and 'active' }}" href="{{ url('index') }}" id="id_nav_item_home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link {{ request.path == url('cloud') and 'active' }}" href="{{ url('cloud') }}" id="id_nav_item_cloud">Cloud</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    {% block body %}
+    {% endblock %}
+</div>
+<script>
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function copyToClipboard(element) {
+        const tc = element.textContent;
+
+        element.textContent = "👉 📋";
+
+        try {
+            const buffer = document.createElement("textarea");
+            buffer.value = tc;
+            document.body.appendChild(buffer);
+            buffer.select();
+            buffer.setSelectionRange(0, 99999); /* For mobile devices */
+            document.execCommand("Copy");
+            buffer.remove();
+
+            await sleep(500);
+        } finally {
+            element.textContent = tc;
+        }
+
+        element.textContent = tc;
+    }
+
+    document.addEventListener("click", async function (event) {
+        if (!event.target.classList.contains("ctc")) {
+            return;
+        }
+        await copyToClipboard(event.target);
+    })
+</script>
+</body>
+</html>

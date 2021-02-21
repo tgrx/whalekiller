@@ -1,0 +1,130 @@
+{
+    "vms": [
+        {
+            "vm_id": "vm-ec02d5c153",
+            "name": "kafka",
+            "tags": [
+                "http"
+            ]
+        },
+        {
+            "vm_id": "vm-a3ed2eed23",
+            "name": "rabbitmq",
+            "tags": [
+                "https",
+                "http"
+            ]
+        },
+        {
+            "vm_id": "vm-2ba4d2f87",
+            "name": "ssh bastion",
+            "tags": [
+                "http",
+                "windows-dc",
+                "nat",
+                "https",
+                "storage"
+            ]
+        },
+        {
+            "vm_id": "vm-b35b501",
+            "name": "dev-srv-5",
+            "tags": [
+                "ssh",
+                "nat",
+                "http",
+                "loadbalancer",
+                "storage"
+            ]
+        },
+        {
+            "vm_id": "vm-7d1ff7af47",
+            "name": "billing service",
+            "tags": [
+                "http"
+            ]
+        }
+    ],
+    "fw_rules": [
+        {
+            "fw_id": "fw-c8706961d",
+            "source_tag": "loadbalancer",
+            "dest_tag": "windows-dc"
+        },
+        {
+            "fw_id": "fw-76f36a3",
+            "source_tag": "ssh",
+            "dest_tag": "ci"
+        },
+        {
+            "fw_id": "fw-487b076a6",
+            "source_tag": "storage",
+            "dest_tag": "reverse_proxy"
+        },
+        {
+            "fw_id": "fw-dd16d0",
+            "source_tag": "nat",
+            "dest_tag": "ssh"
+        },
+        {
+            "fw_id": "fw-36719127",
+            "source_tag": "https",
+            "dest_tag": "loadbalancer"
+        },
+        {
+            "fw_id": "fw-1f8b1e8d8",
+            "source_tag": "loadbalancer",
+            "dest_tag": "storage"
+        },
+        {
+            "fw_id": "fw-e602b7a05",
+            "source_tag": "nat",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-4e337463",
+            "source_tag": "reverse_proxy",
+            "dest_tag": "storage"
+        },
+        {
+            "fw_id": "fw-a646f8da6",
+            "source_tag": "http",
+            "dest_tag": "http"
+        },
+        {
+            "fw_id": "fw-28c3124",
+            "source_tag": "ssh",
+            "dest_tag": "https"
+        },
+        {
+            "fw_id": "fw-1310da",
+            "source_tag": "ssh",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-64ae2f2be7",
+            "source_tag": "corp",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-488809fc3",
+            "source_tag": "corp",
+            "dest_tag": "windows-dc"
+        },
+        {
+            "fw_id": "fw-4878f98212",
+            "source_tag": "ssh",
+            "dest_tag": "ssh"
+        },
+        {
+            "fw_id": "fw-1a0642c",
+            "source_tag": "nat",
+            "dest_tag": "corp"
+        },
+        {
+            "fw_id": "fw-e6b9108",
+            "source_tag": "windows-dc",
+            "dest_tag": "corp"
+        }
+    ]
+}

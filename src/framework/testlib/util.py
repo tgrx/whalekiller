@@ -11,9 +11,9 @@ from framework.testlib.pages import PageObject
 
 def screenshot_on_failure(test):
     @wraps(test)
-    def decorated_test(browser, request, *args, **kwargs):
+    async def decorated_test(browser, request, *args, **kwargs):
         try:
-            test(browser, request, *args, **kwargs)
+            return await test(browser, request, *args, **kwargs)
         except Exception:
             ts = datetime.now().strftime(f"%Y.%m.%d.%H.%M.%S")
             test_name = f"{request.module.__name__}.{test.__name__}"

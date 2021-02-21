@@ -1,0 +1,29 @@
+{% extends "_base.html" %}
+{% block title %}Cloud{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm">
+            <section>
+                <h2>Actions</h2>
+                <ul>
+                    <li><a href="{{ url_for('cloud') }}">Configure your Cloud</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <section>
+                <h2>Migrations</h2>
+                <table>
+                    {% for m in migrations %}
+                        <tr>
+                            <td>{{ m.version }}</td>
+                            <td>{{ m.applied_at }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </section>
+        </div>
+    </div>
+{% endblock %}

@@ -11,8 +11,10 @@ run-dev::
 		--host 0.0.0.0 \
 		--lifespan off \
 		--log-level debug \
+		--loop asyncio \
 		--port 8000 \
 		--reload \
+		--reload-dir $(DIR_SRC) \
 		--workers 1 \
 		--ws none \
 		$(APPLICATION)

@@ -1,12 +1,10 @@
-import asyncio
-
 import pytest
 
-from main.db import Session
+from main.db.sessions import Session
 
 
 @pytest.yield_fixture(scope="function")
-async def session():
+async def db_session(event_loop):
     async with Session() as s:
         s.begin()
         _pc, s.commit = s.commit, s.flush
@@ -15,9 +13,3 @@ async def session():
         s.begin = _pb
         s.commit = _pc
         await s.rollback()
-
-
-@pytest.yield_fixture(scope="session")
-def event_loop():
-    loop = asyncio.get_event_loop()
-    yield loop

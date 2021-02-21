@@ -1,0 +1,86 @@
+{% extends "_base.html" %}
+{% block title %}Cloud{% endblock %}
+{% block body %}
+    <section>
+        <h2>Cloud</h2>
+        <p>
+            <button aria-controls="id_create_cloud_section" aria-expanded="false" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#id_create_cloud_section" id="id_create_cloud_collapser" type="button">
+                Create cloud
+            </button>
+        </p>
+        <section class="collapse" id="id_create_cloud_section">
+            <form action="{{ url('cloud-setup') }}" enctype="multipart/form-data" method="post">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="id_json_config_label">📄</span>
+                    <input aria-describedby="id_json_config_label" aria-label="Config" class="form-control" id="id_input_config" name="config" type="file">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="id_password_label">🔑</span>
+                    <input aria-describedby="id_password_label" aria-label="Admin password" class="form-control" id="id_input_password" name="password" type="password">
+                </div>
+                <button class="btn btn-success" id="id_create_cloud_submit" type="submit">Create</button>
+            </form>
+        </section>
+        <section>
+            <h3>Virtual Machines</h3>
+            <div class="row">
+                {% for obj in vms %}
+                    <div class="col-sm-3 mb-4">
+                        <section class="card" id="id_vm_{{ obj.vm_pk }}">
+                            <div class="card-body">
+                                <h5 class="card-title ctc">{{ obj.name or 'VM' }}</h5>
+                                <div class="card-text">
+                                    <ul class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="ctc">{{ obj.vm_pk }}</span>
+                                            <span class="badge bg-secondary">PK</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="ctc">{{ obj.vm_id }}</span>
+                                            <span class="badge bg-secondary">ID</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                {% for t in obj.tags %}
+                                                    <span class="badge bg-ambi rounded-pill ctc">{{ t.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        <section>
+            <h3>Firewall Rules</h3>
+            <div class="row">
+                {% for obj in fw_rules %}
+                    <div class="col-sm-3 mb-4">
+                        <section class="card" id="id_fw_{{ obj.fw_pk }}">
+                            <div class="card-body">
+                                <h5 class="card-title ctc">{{ obj.fw_id }}</h5>
+                                <div class="card-text">
+                                    <ul class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="ctc">{{ obj.fw_pk }}</span>
+                                            <span class="badge bg-secondary">PK</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="badge bg-success rounded-pill ctc">{{ obj.source.name }}</span>
+                                                <span class="badge bg-danger rounded-pill ctc">{{ obj.dest.name }}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+{% endblock %}

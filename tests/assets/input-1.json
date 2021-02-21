@@ -1,0 +1,122 @@
+{
+    "vms": [
+        {
+            "vm_id": "vm-b8e6c350",
+            "name": "rabbitmq",
+            "tags": [
+                "windows-dc"
+            ]
+        },
+        {
+            "vm_id": "vm-c1e6285f",
+            "name": "k8s node",
+            "tags": [
+                "http",
+                "ci"
+            ]
+        },
+        {
+            "vm_id": "vm-cf1f8621",
+            "name": "k8s node",
+            "tags": [
+                "windows-dc"
+            ]
+        },
+        {
+            "vm_id": "vm-b462c04",
+            "name": "jira server",
+            "tags": [
+                "windows-dc",
+                "storage"
+            ]
+        },
+        {
+            "vm_id": "vm-8d2d12765",
+            "name": "kafka",
+            "tags": []
+        },
+        {
+            "vm_id": "vm-9cbedf7c66",
+            "name": "etcd node",
+            "tags": []
+        },
+        {
+            "vm_id": "vm-ae24e37f8a",
+            "name": "frontend server",
+            "tags": [
+                "api",
+                "dev"
+            ]
+        },
+        {
+            "vm_id": "vm-e30d5fa49a",
+            "name": "etcd node",
+            "tags": [
+                "dev",
+                "api"
+            ]
+        },
+        {
+            "vm_id": "vm-1b1cc9cd",
+            "name": "billing service",
+            "tags": []
+        },
+        {
+            "vm_id": "vm-f270036588",
+            "name": "kafka",
+            "tags": []
+        }
+    ],
+    "fw_rules": [
+        {
+            "fw_id": "fw-c4a11ac",
+            "source_tag": "k8s",
+            "dest_tag": "loadbalancer"
+        },
+        {
+            "fw_id": "fw-1cb4c1",
+            "source_tag": "django",
+            "dest_tag": "django"
+        },
+        {
+            "fw_id": "fw-0d91970ee",
+            "source_tag": "corp",
+            "dest_tag": "django"
+        },
+        {
+            "fw_id": "fw-778beb64",
+            "source_tag": "django",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-1008d7",
+            "source_tag": "ssh",
+            "dest_tag": "ssh"
+        },
+        {
+            "fw_id": "fw-1c8ebac1f",
+            "source_tag": "loadbalancer",
+            "dest_tag": "corp"
+        },
+        {
+            "fw_id": "fw-06bf6a628",
+            "source_tag": "nat",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-9d030bb4bb",
+            "source_tag": "corp",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-fbcfcc16e1",
+            "source_tag": "antivirus",
+            "dest_tag": "nat"
+        },
+        {
+            "fw_id": "fw-c74204",
+            "source_tag": "antivirus",
+            "dest_tag": "antivirus"
+        }
+    ]
+}

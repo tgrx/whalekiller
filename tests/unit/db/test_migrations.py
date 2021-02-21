@@ -1,15 +1,15 @@
 import pytest
 from sqlalchemy import select
 
-from main.db import Migration
+from main.db.models import Migration
 
 
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_migrations(session):
-    async with session.begin():
+async def test_migrations(db_session):
+    async with db_session.begin():
         stmt = select(Migration)
-        results = await session.execute(stmt)
+        results = await db_session.execute(stmt)
         migrations = list(results.scalars())
 
     assert len(migrations) == 4

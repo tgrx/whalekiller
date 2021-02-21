@@ -4,24 +4,16 @@ from framework.testlib.util import screenshot_on_failure
 from tests.functional.pages import MainPage
 
 
+@pytest.mark.asyncio
 @pytest.mark.functional
 @screenshot_on_failure
-def test(browser, request, service_url):
+async def test(browser, request, service_url, empty_cloud):
     page = MainPage(browser, service_url)
 
-    validate_title(page)
-    validate_content(page)
+    assert page.title == "Cloud :: WhaleKiller"
 
+    assert page.nav_home.tag_name == "a"
+    assert page.nav_home.get_attribute("href") == f"{service_url}/"
 
-def validate_title(page: MainPage):
-    assert page.title == "WhaleKiller"
-
-
-def validate_content(page: MainPage):
-    assert page.h1.tag_name == "h1"
-    assert page.h1.text == "WhaleKiller"
-    assert page.p.tag_name == "p"
-    assert page.p.text == "This service provide security checks for your cloud VMs."
-
-    html = page.html
-    assert "<hr>" in html
+    assert page.nav_cloud.tag_name == "a"
+    assert page.nav_cloud.get_attribute("href") == f"{service_url}/cloud"
