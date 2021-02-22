@@ -17,8 +17,8 @@ from framework.dirs import DIR_TEMPLATES
 from main import urls
 from main.actions import get_all_firewall_rules
 from main.actions import get_all_virtual_machines
-from main.actions import get_app_stats
 from main.actions import get_attackers_for_vm
+from main.actions import get_stats
 from main.actions import prepare_config_data
 from main.actions import reset_cloud
 from main.actions import setup_cloud
@@ -107,5 +107,5 @@ async def handle_api_stats() -> StatsSchema:
     if not settings.BENCHMARK_REQUESTS:
         return StatsSchema()
 
-    stats = get_app_stats()
+    stats = get_stats()
     return stats

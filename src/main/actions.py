@@ -184,6 +184,10 @@ async def setup_cloud(cloud: CloudConfigSchema) -> None:
         session.add_all(vms)
         logger.debug("vms have been created")
 
+        logger.debug("... number of vms is to be updated")
+        update_nr_vms(len(vms))
+        logger.debug("number of vms has been updated")
+
         logger.debug("... fw rules are to be created")
         fw_rules = [
             FirewallRule(
@@ -199,29 +203,35 @@ async def setup_cloud(cloud: CloudConfigSchema) -> None:
 
 def update_timings(path: str, seconds: float) -> None:
     with redis_engine() as r:
-        r.hincrby("bench:requests", path, 1)
-        r.hincrbyfloat("bench:time", path, seconds)
+        r.hincrby("whalekiller:requests", path, 1)
+        r.hincrbyfloat("whalekiller:seconds", path, seconds)
 
     logger.debug(f"update stats: {path} - {seconds:.4f} s")
 
 
-def get_app_stats() -> StatsSchema:
+def update_nr_vms(nr_vms: int):
     with redis_engine() as r:
-        bench_r: Dict[bytes, bytes] = r.hgetall("bench:requests")
-        bench_t: Dict[bytes, bytes] = r.hgetall("bench:time")
+        r.set("whalekiller:nr_vms", str(nr_vms).encode())
+
+
+def get_stats() -> StatsSchema:
+    with redis_engine() as r:
+        endpoint_requests: Dict[bytes, bytes] = r.hgetall("whalekiller:requests")
+        endpoint_seconds: Dict[bytes, bytes] = r.hgetall("whalekiller:seconds")
+        nr_vms = int(r.get("whalekiller:nr_vms") or b"0")
 
     app_nr_requests = 0
     app_seconds = 0.0
 
     endpoint_stats = {}
 
-    for endpoint, value_raw in bench_r.items():
+    for endpoint, value_raw in endpoint_requests.items():
         key = endpoint.decode()
         value = int(value_raw)
         endpoint_stats.setdefault(key, {})["nr_requests"] = value
         app_nr_requests += value
 
-    for endpoint, value_raw in bench_t.items():
+    for endpoint, value_raw in endpoint_seconds.items():
         key = endpoint.decode()
         value = float(value_raw)
         stats = endpoint_stats.setdefault(key, {})
@@ -231,13 +241,16 @@ def get_app_stats() -> StatsSchema:
 
     app_avg_seconds = app_seconds / (app_nr_requests or 1)
 
-    app_stats = StatsSchema(
-        app=StatsItemSchema(
-            avg_seconds=app_avg_seconds,
-            nr_requests=app_nr_requests,
-            seconds=app_seconds,
-        ),
-        endpoints=endpoint_stats,
+    app_stats = StatsItemSchema(
+        avg_seconds=app_avg_seconds,
+        nr_requests=app_nr_requests,
+        seconds=app_seconds,
     )
 
-    return app_stats
+    stats = StatsSchema(
+        app=app_stats,
+        endpoints=endpoint_stats,
+        nr_vms=nr_vms,
+    )
+
+    return stats

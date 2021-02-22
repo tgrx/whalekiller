@@ -14,8 +14,9 @@ class StatsItemSchema(BaseModel):
 
 
 class StatsSchema(BaseModel):
-    endpoints: Dict[str, StatsItemSchema] = Field(default={})
     app: StatsItemSchema = Field(default_factory=StatsItemSchema)
+    endpoints: Dict[str, StatsItemSchema] = Field(default={})
+    nr_vms: int = Field(default=0)
 
     class Config:
         allow_mutation = False
