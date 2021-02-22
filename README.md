@@ -29,7 +29,8 @@ for your cloud VMs.
 
 ## How to use
 
-RTFM
+Just visit [whalekiller.herokuapp.com](https://whalekiller.herokuapp.com)
+and press some buttons over there.
 
 ## How to run locally
 
@@ -76,6 +77,11 @@ with a `.venv/` folder created.
 It will be used as virtualenv location.
 
 Packages to be installed are listed in [Pipfile](Pipfile).
+
+[Pipfile](Pipfile) requires Python 3.9.
+You can try to use Python 3.7+, but you'll need
+to remove Pipfile.lock
+and to change Pipfile's version requirement.
 
 Section `[packages]` contains packages
 which are needed for service itself.
@@ -138,6 +144,19 @@ default:
   TEST_BROWSER_HEADLESS: true
 ```
 
+Example of `config/.secrets.yml`:
+
+```yaml
+default:
+  BENCHMARK_REQUESTS: true
+  DATABASE_URL: "postgresql://localhost/whalekiller"
+  MODE_DEBUG: true
+  MODE_DEBUG_SQL: true
+  REDIS_URL: "redis://"
+  TEST_BROWSER: "chrome"
+  TEST_BROWSER_HEADLESS: false
+```
+
 #### Pre-run actions
 
 You **MUST** create the database.
@@ -166,5 +185,8 @@ in your `config/.secrets.yml`.
 
 #### Debugging
 
-You **MAY** use [src/main/app.py](src/main/app.py)
+You **MAY** use [src/main/runner.py](src/main/runner.py)
 as a runner script.
+
+You **MAY** use a command `make run-dev`
+to run a local uvicorn with development configuration.
