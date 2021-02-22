@@ -12,6 +12,7 @@ from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from framework import monitoring
+from framework.config import settings
 from framework.dirs import DIR_TEMPLATES
 from main import urls
 from main.actions import get_all_firewall_rules
@@ -23,7 +24,7 @@ from main.actions import reset_cloud
 from main.actions import setup_cloud
 from main.auth import check_password
 from main.middleware import BenchMiddleware
-from main.schemas.stats import DynamicAppStatsSchema
+from main.schemas.stats import StatsSchema
 
 monitoring.configure()
 
@@ -102,6 +103,9 @@ async def handle_api_attack(vm_id: str) -> List[str]:
 
 
 @app.get(urls.PATH_STATS, name="stats")
-async def handle_api_stats() -> DynamicAppStatsSchema:
+async def handle_api_stats() -> StatsSchema:
+    if not settings.BENCHMARK_REQUESTS:
+        return StatsSchema()
+
     stats = get_app_stats()
     return stats

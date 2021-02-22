@@ -14,5 +14,8 @@ engine = create_async_engine(
 
 @contextlib.contextmanager
 def redis_engine():
-    with contextlib.closing(Redis(db=0)) as rc:
+    if not settings.REDIS_URL:
+        raise RuntimeError("REDIS_URL is not configured")
+
+    with contextlib.closing(Redis.from_url(settings.REDIS_URL)) as rc:
         yield rc

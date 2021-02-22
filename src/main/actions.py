@@ -20,8 +20,8 @@ from main.db.models import VirtualMachine
 from main.db.models import vm_tag
 from main.db.sessions import begin_session
 from main.schemas import CloudConfigSchema
-from main.schemas.stats import AppStatsSchema
 from main.schemas.stats import StatsItemSchema
+from main.schemas.stats import StatsSchema
 
 
 async def get_all_migrations() -> List[Migration]:
@@ -205,7 +205,7 @@ def update_timings(path: str, seconds: float) -> None:
     logger.debug(f"update stats: {path} - {seconds:.4f} s")
 
 
-def get_app_stats() -> AppStatsSchema:
+def get_app_stats() -> StatsSchema:
     with redis_engine() as r:
         bench_r: Dict[bytes, bytes] = r.hgetall("bench:requests")
         bench_t: Dict[bytes, bytes] = r.hgetall("bench:time")
@@ -231,7 +231,7 @@ def get_app_stats() -> AppStatsSchema:
 
     app_avg_seconds = app_seconds / (app_nr_requests or 1)
 
-    app_stats = AppStatsSchema(
+    app_stats = StatsSchema(
         app=StatsItemSchema(
             avg_seconds=app_avg_seconds,
             nr_requests=app_nr_requests,
