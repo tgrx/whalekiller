@@ -4,25 +4,11 @@
     <div class="row">
         <div class="col-sm">
             <section>
-                <h2>Actions</h2>
+                <h2>Resources</h2>
                 <ul>
-                    <li><a href="{{ url_for('cloud') }}">Configure your Cloud</a></li>
+                    <li><a href="{{ urls.PATH_DOCS }}">Swagger UI</a></li>
+                    <li><a href="{{ url('attack') }}?vm_id=vm-c7bac01a07">Example of /attack usage</a></li>
                 </ul>
-            </section>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm">
-            <section>
-                <h2>Migrations</h2>
-                <table>
-                    {% for m in migrations %}
-                        <tr>
-                            <td>{{ m.version }}</td>
-                            <td>{{ m.applied_at }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
             </section>
         </div>
     </div>
