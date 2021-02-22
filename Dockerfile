@@ -31,10 +31,8 @@ COPY ./config/ ./config/
 COPY ./scripts/ ./scripts/
 RUN chmod +x ./scripts/*
 
-RUN make \
-        venv-prod \
-        release \
-        || exit 1
+RUN make venv-prod
+RUN make release
 
 COPY ./ ./
 
