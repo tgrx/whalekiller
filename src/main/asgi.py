@@ -15,13 +15,15 @@ from framework import monitoring
 from framework.dirs import DIR_TEMPLATES
 from main import urls
 from main.actions import get_all_firewall_rules
-from main.actions import get_all_migrations
 from main.actions import get_all_virtual_machines
+from main.actions import get_app_stats
 from main.actions import get_attackers_for_vm
 from main.actions import prepare_config_data
 from main.actions import reset_cloud
 from main.actions import setup_cloud
 from main.auth import check_password
+from main.middleware import BenchMiddleware
+from main.schemas.stats import DynamicAppStatsSchema
 
 monitoring.configure()
 
@@ -33,6 +35,8 @@ app = FastAPI(
     title="WhaleKiller API",
     version="1.0.0",
 )
+
+app.add_middleware(BenchMiddleware)
 
 
 def url(name: str, **path_params: Any) -> str:
@@ -95,3 +99,9 @@ async def handle_api_attack(vm_id: str) -> List[str]:
     attackers = await get_attackers_for_vm(vm_id)
 
     return attackers
+
+
+@app.get(urls.PATH_STATS, name="stats")
+async def handle_api_stats() -> DynamicAppStatsSchema:
+    stats = get_app_stats()
+    return stats

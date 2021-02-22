@@ -1,4 +1,5 @@
 from itertools import chain
+from typing import Dict
 from typing import IO
 from typing import List
 
@@ -11,6 +12,7 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 
 from framework.logging import logger
+from main.db.engines import redis_engine
 from main.db.models import FirewallRule
 from main.db.models import Migration
 from main.db.models import Tag
@@ -18,6 +20,8 @@ from main.db.models import VirtualMachine
 from main.db.models import vm_tag
 from main.db.sessions import begin_session
 from main.schemas import CloudConfigSchema
+from main.schemas.stats import AppStatsSchema
+from main.schemas.stats import StatsItemSchema
 
 
 async def get_all_migrations() -> List[Migration]:
@@ -191,3 +195,49 @@ async def setup_cloud(cloud: CloudConfigSchema) -> None:
         ]
         session.add_all(fw_rules)
         logger.debug("fw_rules have been created")
+
+
+def update_timings(path: str, seconds: float) -> None:
+    with redis_engine() as r:
+        r.hincrby("bench:requests", path, 1)
+        r.hincrbyfloat("bench:time", path, seconds)
+
+    logger.debug(f"update stats: {path} - {seconds:.4f} s")
+
+
+def get_app_stats() -> AppStatsSchema:
+    with redis_engine() as r:
+        bench_r: Dict[bytes, bytes] = r.hgetall("bench:requests")
+        bench_t: Dict[bytes, bytes] = r.hgetall("bench:time")
+
+    app_nr_requests = 0
+    app_seconds = 0.0
+
+    endpoint_stats = {}
+
+    for endpoint, value_raw in bench_r.items():
+        key = endpoint.decode()
+        value = int(value_raw)
+        endpoint_stats.setdefault(key, {})["nr_requests"] = value
+        app_nr_requests += value
+
+    for endpoint, value_raw in bench_t.items():
+        key = endpoint.decode()
+        value = float(value_raw)
+        stats = endpoint_stats.setdefault(key, {})
+        stats["seconds"] = value
+        stats["avg_seconds"] = value / (stats["nr_requests"] or 1)
+        app_seconds += value
+
+    app_avg_seconds = app_seconds / (app_nr_requests or 1)
+
+    app_stats = AppStatsSchema(
+        app=StatsItemSchema(
+            avg_seconds=app_avg_seconds,
+            nr_requests=app_nr_requests,
+            seconds=app_seconds,
+        ),
+        endpoints=endpoint_stats,
+    )
+
+    return app_stats
