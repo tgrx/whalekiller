@@ -32,7 +32,6 @@ COPY ./scripts/ ./scripts/
 RUN chmod +x ./scripts/*
 
 RUN make venv-prod
-RUN make release
 
 COPY ./ ./
 

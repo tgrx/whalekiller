@@ -5,7 +5,7 @@ services:
     container_name: whalekiller-web
     depends_on:
       - whalekiller-db
-    entrypoint: ["make", "wait-for-db", "run-prod"]
+    entrypoint: ["make", "wait-for-db", "release", "run-prod"]
     environment:
       DATABASE_URL: "postgresql://whalekiller:whalekiller@whalekiller-db:5432/whalekiller"
       REDIS_URL: "redis://whalekiller-redis"
