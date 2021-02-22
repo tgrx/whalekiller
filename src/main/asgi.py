@@ -45,11 +45,9 @@ templates.env.globals["url"] = url
 
 @app.get(urls.PATH_INDEX, name="index", response_class=HTMLResponse)
 async def handle_index(request: Request):
-    migrations = await get_all_migrations()
-
     context = {
-        "migrations": migrations,
         "request": request,
+        "urls": urls,
     }
 
     response = templates.TemplateResponse(
@@ -92,7 +90,7 @@ async def handle_cloud_setup(config: UploadFile = File(...), password: str = For
     return response
 
 
-@app.get(urls.PATH_ATTACK)
+@app.get(urls.PATH_ATTACK, name="attack")
 async def handle_api_attack(vm_id: str) -> List[str]:
     attackers = await get_attackers_for_vm(vm_id)
 
