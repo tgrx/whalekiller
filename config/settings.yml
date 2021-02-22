@@ -1,5 +1,6 @@
 default:
   ADMIN_PASSWORD: ""
+  BENCHMARK_REQUESTS: false
   DATABASE_URL: ""
   HEROKU_API_TOKEN: ""
   HEROKU_APP_NAME: ""
@@ -8,6 +9,7 @@ default:
   MODE_DEBUG_SQL: false
   MODE_PROFILING: false
   PORT: -1
+  REDIS_URL: ""
   REQUEST_TIMEOUT: 0
   SENTRY_DSN: ""
   TEST_BROWSER: ""
