@@ -5,9 +5,10 @@ services:
     container_name: whalekiller-web
     depends_on:
       - whalekiller-db
-    entrypoint: ["make", "wait-for-db", "run-prod"]
+    entrypoint: ["make", "wait-for-db", "release", "run-prod"]
     environment:
       DATABASE_URL: "postgresql://whalekiller:whalekiller@whalekiller-db:5432/whalekiller"
+      REDIS_URL: "redis://whalekiller-redis"
       PORT: 80
     image: whalekiller-web
     ports:
@@ -24,6 +25,9 @@ services:
     restart: always
     volumes:
       - whalekiller-volume:/var/lib/postgresql/data
+  whalekiller-redis:
+    container_name: whalekiller-redis
+    image: redis:latest
   whalekiller-dba:
     container_name: whalekiller-dba
     image: adminer

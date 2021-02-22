@@ -18,6 +18,7 @@ jobs:
       PGPASSWORD: ci
       PIPENV_VENV_IN_PROJECT: 1
       PYTHONPATH: src
+      REDIS_URL: "redis://"
 
     docker:
       - image: circleci/python:3.9.1-browsers
@@ -33,6 +34,11 @@ jobs:
           POSTGRES_DB: ci
           POSTGRES_PASSWORD: ci
           POSTGRES_USER: ci
+
+      - image: circleci/redis:6.0.9-alpine
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
 
     steps:
       - checkout

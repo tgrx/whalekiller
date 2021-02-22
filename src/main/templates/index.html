@@ -2,6 +2,27 @@
 {% block title %}Cloud{% endblock %}
 {% block body %}
     <div class="row">
+        <div class="col-sm mb-4 mr-4">
+            <section>
+                <h2>Health check</h2>
+                <section>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Requests
+                            <span id="id_nr_requests" class="badge bg-success">0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Seconds per request
+                            <span id="id_avg_seconds" class="badge bg-success">0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Virtual machines
+                            <span id="id_nr_vms" class="badge bg-success">0</span>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+        </div>
         <div class="col-sm">
             <section>
                 <h2>Resources</h2>
@@ -12,4 +33,48 @@
             </section>
         </div>
     </div>
+    <script>
+        async function getStats() {
+            let api_url = `/api/v1/stats`;
+
+            const response = await fetch(api_url, {
+                method: "GET",
+            })
+
+            if (response.status !== 200) {
+                return null;
+            }
+
+            return await response.json();
+        }
+
+        async function updateStats() {
+            const nr_requests = document.getElementById("id_nr_requests");
+            const avg_seconds = document.getElementById("id_avg_seconds");
+            const nr_vms = document.getElementById("id_nr_vms");
+
+            const stats = await getStats();
+            if (!stats || !stats.hasOwnProperty("app") || !stats.hasOwnProperty("nr_vms")) {
+                return;
+            }
+
+            const app_stats = stats.app;
+
+            nr_vms.textContent = stats.nr_vms;
+
+            if (app_stats.hasOwnProperty("nr_requests")) {
+                nr_requests.textContent = app_stats.nr_requests;
+            }
+
+            if (app_stats.hasOwnProperty("avg_seconds")) {
+                const value = parseFloat(app_stats.avg_seconds).toFixed(4);
+                avg_seconds.textContent = value.toString();
+            }
+
+        }
+
+        document.addEventListener("DOMContentLoaded", (event) => {
+            setInterval(updateStats, 1000);
+        })
+    </script>
 {% endblock %}

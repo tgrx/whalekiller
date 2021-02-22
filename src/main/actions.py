@@ -1,4 +1,5 @@
 from itertools import chain
+from typing import Dict
 from typing import IO
 from typing import List
 
@@ -11,6 +12,7 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 
 from framework.logging import logger
+from main.db.engines import redis_engine
 from main.db.models import FirewallRule
 from main.db.models import Migration
 from main.db.models import Tag
@@ -18,6 +20,8 @@ from main.db.models import VirtualMachine
 from main.db.models import vm_tag
 from main.db.sessions import begin_session
 from main.schemas import CloudConfigSchema
+from main.schemas.stats import StatsItemSchema
+from main.schemas.stats import StatsSchema
 
 
 async def get_all_migrations() -> List[Migration]:
@@ -180,6 +184,10 @@ async def setup_cloud(cloud: CloudConfigSchema) -> None:
         session.add_all(vms)
         logger.debug("vms have been created")
 
+        logger.debug("... number of vms is to be updated")
+        update_nr_vms(len(vms))
+        logger.debug("number of vms has been updated")
+
         logger.debug("... fw rules are to be created")
         fw_rules = [
             FirewallRule(
@@ -191,3 +199,58 @@ async def setup_cloud(cloud: CloudConfigSchema) -> None:
         ]
         session.add_all(fw_rules)
         logger.debug("fw_rules have been created")
+
+
+def update_timings(path: str, seconds: float) -> None:
+    with redis_engine() as r:
+        r.hincrby("whalekiller:requests", path, 1)
+        r.hincrbyfloat("whalekiller:seconds", path, seconds)
+
+    logger.debug(f"update stats: {path} - {seconds:.4f} s")
+
+
+def update_nr_vms(nr_vms: int):
+    with redis_engine() as r:
+        r.set("whalekiller:nr_vms", str(nr_vms).encode())
+
+
+def get_stats() -> StatsSchema:
+    with redis_engine() as r:
+        endpoint_requests: Dict[bytes, bytes] = r.hgetall("whalekiller:requests")
+        endpoint_seconds: Dict[bytes, bytes] = r.hgetall("whalekiller:seconds")
+        nr_vms = int(r.get("whalekiller:nr_vms") or b"0")
+
+    app_nr_requests = 0
+    app_seconds = 0.0
+
+    endpoint_stats = {}
+
+    for endpoint, value_raw in endpoint_requests.items():
+        key = endpoint.decode()
+        value = int(value_raw)
+        endpoint_stats.setdefault(key, {})["nr_requests"] = value
+        app_nr_requests += value
+
+    for endpoint, value_raw in endpoint_seconds.items():
+        key = endpoint.decode()
+        value = float(value_raw)
+        stats = endpoint_stats.setdefault(key, {})
+        stats["seconds"] = value
+        stats["avg_seconds"] = value / (stats["nr_requests"] or 1)
+        app_seconds += value
+
+    app_avg_seconds = app_seconds / (app_nr_requests or 1)
+
+    app_stats = StatsItemSchema(
+        avg_seconds=app_avg_seconds,
+        nr_requests=app_nr_requests,
+        seconds=app_seconds,
+    )
+
+    stats = StatsSchema(
+        app=app_stats,
+        endpoints=endpoint_stats,
+        nr_vms=nr_vms,
+    )
+
+    return stats
