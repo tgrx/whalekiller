@@ -1,4 +1,5 @@
-from itertools import dropwhile
+from functools import partial
+from typing import Collection
 from typing import NoReturn
 from typing import Optional
 from typing import Sequence
@@ -16,13 +17,35 @@ AttackVectorT = Tuple[VirtualMachineSchema, Sequence[VirtualMachineSchema]]
 AttackVectorsT = Sequence[AttackVectorT]
 
 
+def find_vm(
+    config: CloudConfigSchema,
+    *,
+    name: Optional[str] = None,
+    tag: Optional[str] = None,
+    tags: Optional[Collection[str]] = None,
+    vm_id: Optional[str] = None,
+) -> VirtualMachineSchema:
+    for vm in config.vms:
+        this = all(
+            (
+                name is None or vm.name == name,
+                vm_id is None or vm.vm_id == vm_id,
+                tag is None or tag in vm.tags,
+                tags is None or set(tags).issubset(vm.tags),
+            )
+        )
+        if this:
+            return vm
+    raise ValueError("no vm found")
+
+
 @pytest.mark.functional
 @pytest.mark.asyncio
 async def test_positive_0(service_url, config_0):
     config_0: CloudConfigSchema
 
-    bastion = next(dropwhile(lambda vm: vm.name != "bastion", config_0.vms))
-    jira_server = next(dropwhile(lambda vm: vm.name != "jira_server", config_0.vms))
+    bastion = find_vm(config_0, name="bastion")
+    jira_server = find_vm(config_0, name="jira_server")
 
     attack_vectors = [
         (bastion, [bastion]),
@@ -36,20 +59,29 @@ async def test_positive_0(service_url, config_0):
 @pytest.mark.asyncio
 async def test_positive_1(service_url, config_1):
     config_1: CloudConfigSchema
+    find_vm_ = partial(find_vm, config_1)
 
-    etcd_node = next(dropwhile(lambda vm: vm.name != "etcd node", config_1.vms))
-    jira_server = next(dropwhile(lambda vm: vm.name != "jira server", config_1.vms))
-    # k8s_node_http_ci = next(dropwhile(lambda vm: vm.name != "jira_server" or not {"http", "ci"}.issubset(vm.tags), config_1.vms))
-    # k8s_node_windows_dc = next(dropwhile(lambda vm: vm.name != "jira_server" or not {"windows-dc"}.issubset(vm.tags), config_1.vms))
-    kafka = next(dropwhile(lambda vm: vm.name != "kafka", config_1.vms))
-    rabbitmq = next(dropwhile(lambda vm: vm.name != "rabbitmq", config_1.vms))
+    billing_service = find_vm_(name="billing service")
+    etcd_node = find_vm_(name="etcd node", tags=[])
+    etcd_node_dev_api = find_vm_(name="etcd node", tags=["dev", "api"])
+    frontend_server = find_vm_(name="frontend server")
+    jira_server = find_vm_(name="jira server")
+    k8s_node_http_ci = find_vm_(name="k8s node", tags=["http", "ci"])
+    k8s_node_windows_dc = find_vm_(name="k8s node", tags=["windows-dc"])
+    kafka_8d2 = find_vm_(name="kafka", vm_id="vm-8d2d12765")
+    kafka_f27 = find_vm_(name="kafka", vm_id="vm-f270036588")
+    rabbitmq = find_vm_(name="rabbitmq")
 
     attack_vectors = [
+        (billing_service, []),
         (etcd_node, []),
+        (etcd_node_dev_api, []),
+        (frontend_server, []),
         (jira_server, []),
-        # (k8s_node_http_ci, []),
-        # (k8s_node_windows_dc, []),
-        (kafka, []),
+        (k8s_node_http_ci, []),
+        (k8s_node_windows_dc, []),
+        (kafka_8d2, []),
+        (kafka_f27, []),
         (rabbitmq, []),
     ]
 
