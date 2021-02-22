@@ -15,10 +15,10 @@ jobs:
     environment:
       ALPHA_ENV: ci
       DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
-      REDIS_URL: "redis://"
       PGPASSWORD: ci
       PIPENV_VENV_IN_PROJECT: 1
       PYTHONPATH: src
+      REDIS_URL: "redis://"
 
     docker:
       - image: circleci/python:3.9.1-browsers
