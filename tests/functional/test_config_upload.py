@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from framework.dirs import DIR_TESTS_ASSETS
@@ -11,7 +13,7 @@ from tests.functional.pages.cloud import CloudPage
 @pytest.mark.asyncio
 @pytest.mark.functional
 @screenshot_on_failure
-async def test(browser, request, service_url, empty_cloud):
+async def test(browser, request, service_url, empty_cloud, tmp_path):
     page = MainPage(browser, service_url)
 
     page.nav_cloud.click()
@@ -51,3 +53,19 @@ async def test(browser, request, service_url, empty_cloud):
 
     for fw in config.fw_rules:
         assert fw.fw_id in ids_fw, fw
+
+    empty_config = tmp_path / f"{os.urandom(8).hex()}.json"
+    empty_config.touch()
+
+    page.ccc.click()
+    page.config.send_keys(empty_config.as_posix())
+    page.password.send_keys("1")
+    page.create_cloud.click()
+    validate_redirect(page, f"{service_url}/cloud")
+    empty_cloud = True
+    for section in page.browser.find_elements_by_tag_name("section"):
+        section_id = section.get_attribute("id") or ""
+        if section_id.startswith("id_fw_") or section_id.startswith("id_vm_"):
+            empty_cloud = False
+            break
+    assert empty_cloud
