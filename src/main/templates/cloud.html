@@ -4,7 +4,8 @@
     <section>
         <h2>Cloud</h2>
         <p>
-            <button aria-controls="id_create_cloud_section" aria-expanded="false" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#id_create_cloud_section" id="id_create_cloud_collapser" type="button">
+            <button aria-controls="id_create_cloud_section" aria-expanded="false" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#id_create_cloud_section"
+                    id="id_create_cloud_collapser" type="button">
                 Create cloud
             </button>
         </p>
@@ -26,17 +27,21 @@
             <div class="row">
                 {% for obj in vms %}
                     <div class="col-sm-3 mb-4">
-                        <section class="card" id="id_vm_{{ obj.vm_pk }}">
+                        <section class="card vm" id="id_vm_{{ obj.vm_pk }}">
                             <div class="card-body">
                                 <h5 class="card-title ctc">{{ obj.name or 'VM' }}</h5>
                                 <div class="card-text">
                                     <ul class="list-group">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="vm-status">💤</span>
+                                            <button class="vm-attack btn btn-sm" type="button">🔥</button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
                                             <span class="ctc">{{ obj.vm_pk }}</span>
                                             <span class="badge bg-secondary">PK</span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span class="ctc">{{ obj.vm_id }}</span>
+                                            <span class="ctc vm-id">{{ obj.vm_id }}</span>
                                             <span class="badge bg-secondary">ID</span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -83,4 +88,160 @@
             </div>
         </section>
     </section>
+    <script>
+        const ATTACK_BOX_SHADOW_ATTACKER = "0px 0px 16px green";
+        const ATTACK_BOX_SHADOW_ATTACKER_SELF = "0px 0px 16px yellow";
+        const ATTACK_BOX_SHADOW_UNDER_ATTACK = "0px 0px 16px red";
+        const ATTACK_BUTTON_CLASS_CHILL = "btn-outline-light";
+        const ATTACK_BUTTON_CLASS_UNDER_ATTACK = "btn-outline-danger";
+        const ATTACK_BUTTON_TEXT_UNDER_ATTACK = "🚫";
+        const ATTACK_STATUS_ATTACKER = "🔫";
+        const ATTACK_STATUS_ATTACKER_SELF = "💥";
+        const ATTACK_STATUS_UNDER_ATTACK = "🔥";
+        const KEY_ATTACKERS = "whalekiller/attackers";
+        const KEY_IS_UNDER_ATTACK = "whalekiller/under_attack";
+
+        let DEFAULT_ATTACK_BOX_SHADOW = null;
+        let DEFAULT_ATTACK_BUTTON_TEXT = null;
+        let DEFAULT_ATTACK_STATUS = null;
+
+        let ALL_VMS = [];
+
+        function isVmNode(node) {
+            return node.tagName === "SECTION" && node.classList.contains("vm");
+        }
+
+        function getVmByAttackButton(attackButtonNode) {
+            return ALL_VMS.find(_vm => {
+                return _vm.btn === attackButtonNode;
+            });
+        }
+
+        function isUnderAttack(vm) {
+            return vm.vmId === sessionStorage.getItem(KEY_IS_UNDER_ATTACK);
+        }
+
+        async function getAttackersForVmId(vmId) {
+            const cacheKey = `${KEY_ATTACKERS}/${vmId}`;
+            let attackers = sessionStorage.getItem(cacheKey);
+            if (attackers) {
+                console.debug(`got attackers from ss: ${attackers.length}`);
+                return attackers;
+            }
+
+            attackers = [];
+
+            const response = await fetch(`/api/v1/attack?vm_id=${vmId}`, {
+                method: "GET",
+            });
+
+            if (response.status !== 200) {
+                return attackers;
+            }
+
+            attackers = await response.json();
+            sessionStorage.setItem(cacheKey, attackers);
+
+            return attackers;
+        }
+
+        async function doAttackVm(vm) {
+            stopAttack(vm);
+            sessionStorage.setItem(KEY_IS_UNDER_ATTACK, vm.vmId);
+            vm.btn.classList.add(ATTACK_BUTTON_CLASS_UNDER_ATTACK);
+            vm.btn.classList.remove(ATTACK_BUTTON_CLASS_CHILL);
+            vm.btn.textContent = ATTACK_BUTTON_TEXT_UNDER_ATTACK;
+            vm.node.style.boxShadow = ATTACK_BOX_SHADOW_UNDER_ATTACK;
+            vm.status.textContent = ATTACK_STATUS_UNDER_ATTACK;
+
+            let attackers = await getAttackersForVmId(vm.vmId);
+            if (!attackers) {
+                return;
+            }
+
+            ALL_VMS.forEach(_vm => {
+                if (attackers.indexOf(_vm.vmId) !== -1) {
+                    if (_vm !== vm) {
+                        _vm.node.style.boxShadow = ATTACK_BOX_SHADOW_ATTACKER;
+                        _vm.status.textContent = ATTACK_STATUS_ATTACKER;
+                    } else {
+                        _vm.node.style.boxShadow = ATTACK_BOX_SHADOW_ATTACKER_SELF;
+                        _vm.status.textContent = ATTACK_STATUS_ATTACKER_SELF;
+                    }
+                }
+            })
+        }
+
+        function stopAttack() {
+            sessionStorage.removeItem(KEY_IS_UNDER_ATTACK);
+            ALL_VMS.forEach(_vm => {
+                _vm.btn.classList.add(ATTACK_BUTTON_CLASS_CHILL);
+                _vm.btn.classList.remove(ATTACK_BUTTON_CLASS_UNDER_ATTACK);
+                _vm.btn.textContent = DEFAULT_ATTACK_BUTTON_TEXT;
+                _vm.node.style.boxShadow = DEFAULT_ATTACK_BOX_SHADOW;
+                _vm.status.textContent = DEFAULT_ATTACK_STATUS;
+            })
+        }
+
+        function populateVMs() {
+            const nodes = document.querySelectorAll("section.vm");
+            let vmId = null;
+            let attackButton = null;
+            let attackStatus = null;
+
+            nodes.forEach(node => {
+                vmId = node.querySelector("span.vm-id").textContent;
+                attackButton = node.querySelector("button.vm-attack");
+                attackStatus = node.querySelector("span.vm-status");
+
+                DEFAULT_ATTACK_BUTTON_TEXT = attackButton.textContent;
+                DEFAULT_ATTACK_BOX_SHADOW = node.style.boxShadow;
+                DEFAULT_ATTACK_STATUS = attackStatus.textContent;
+
+                ALL_VMS.push({
+                    btn: attackButton,
+                    node: node,
+                    status: attackStatus,
+                    vmId: vmId,
+                });
+            })
+        }
+
+        document.addEventListener("DOMContentLoaded", (event) => {
+            console.debug(`>>>> populate all vms on DOM load`);
+
+            populateVMs();
+            stopAttack();
+
+            console.debug(`(ok) vms are populated: ${ALL_VMS.length}`);
+        });
+
+        document.addEventListener("click", async function (event) {
+            console.debug(`>>>> click detected`);
+            if (!(event.target.tagName === "BUTTON" && event.target.classList.contains("vm-attack"))) {
+                console.debug(`(skip) not attack btn`);
+                return;
+            }
+            console.debug(`(ok) attack btn click`);
+
+            console.debug(`>>>> get vm by attack btn`);
+            const vm = getVmByAttackButton(event.target);
+            console.debug(`(ok) found vm: ${vm.vmId}`);
+
+            if (!vm) {
+                console.debug(`(exit) no vm found by btn, exit`);
+                return;
+            }
+
+            if (isUnderAttack(vm)) {
+                console.debug(`>>>> vm ${vm.vmId} is under attack, stopping`);
+                stopAttack();
+                console.debug(`(ok) attack on vm ${vm.vmId} stopped`);
+            } else {
+                console.debug(`>>>> vm ${vm.vmId} is chill, attacking`);
+                await doAttackVm(vm);
+                console.debug(`(ok) attack on vm ${vm.vmId} started`);
+            }
+        });
+    </script>
 {% endblock %}
