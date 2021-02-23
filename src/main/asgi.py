@@ -4,7 +4,9 @@ from typing import List
 from fastapi import FastAPI
 from fastapi import File
 from fastapi import Form
+from fastapi import HTTPException
 from fastapi import UploadFile
+from pydantic import ValidationError
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
@@ -83,12 +85,20 @@ async def handle_cloud(request: Request):
 
 
 @app.post(urls.PATH_CLOUD_SETUP, name="cloud-setup", response_class=RedirectResponse)
-async def handle_cloud_setup(config: UploadFile = File(...), password: str = Form(...)):
+async def handle_cloud_setup(
+    config: UploadFile = File(default=None), password: str = Form(...)
+):
     check_password(password, "Only admin is allowed to configure a cloud")
 
-    await reset_cloud()
-    config_data = await prepare_config_data(config.file)
-    await setup_cloud(config_data)
+    try:
+        config_data = await prepare_config_data(config.file if config else None)
+        await reset_cloud()
+        await setup_cloud(config_data)
+    except ValidationError as err:
+        raise HTTPException(
+            detail=f"malformed json config file: {err}",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
 
     response = RedirectResponse(status_code=status.HTTP_302_FOUND, url=urls.PATH_CLOUD)
 

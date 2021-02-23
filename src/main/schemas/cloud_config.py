@@ -8,5 +8,5 @@ from main.schemas.virtual_machine import VirtualMachineSchema
 
 
 class CloudConfigSchema(BaseModel):
-    vms: List[VirtualMachineSchema] = Field(default_factory=[])
-    fw_rules: List[FirewallRuleSchema] = Field(default_factory=[])
+    vms: List[VirtualMachineSchema] = Field(default_factory=list)
+    fw_rules: List[FirewallRuleSchema] = Field(default_factory=list)

@@ -2,7 +2,9 @@ from itertools import chain
 from typing import Dict
 from typing import IO
 from typing import List
+from typing import Optional
 
+from pydantic import ValidationError
 from sqlalchemy import alias
 from sqlalchemy import and_
 from sqlalchemy import delete
@@ -139,11 +141,24 @@ async def reset_cloud() -> None:
     logger.info("cloud has been reset")
 
 
-async def prepare_config_data(fp: IO) -> CloudConfigSchema:
+async def prepare_config_data(fp: Optional[IO]) -> CloudConfigSchema:
     logger.debug("... cloud to be read from file")
 
+    conf = CloudConfigSchema()
+    if not fp:
+        logger.debug("no fp to read, using empty config")
+        return conf
+
     data = fp.read()
-    conf = CloudConfigSchema.parse_raw(data)
+    if not data:
+        logger.debug("empty json config")
+        return conf
+
+    try:
+        conf = CloudConfigSchema.parse_raw(data)
+    except ValidationError as err:
+        logger.debug(f"malformed conf file: {err}")
+        raise
 
     logger.debug("cloud config has been populated")
 
