@@ -22,7 +22,6 @@ services:
     image: postgres:13.1-alpine
     ports:
       - "5555:5432"
-    restart: always
     volumes:
       - whalekiller-volume:/var/lib/postgresql/data
   whalekiller-redis:
@@ -31,7 +30,6 @@ services:
   whalekiller-dba:
     container_name: whalekiller-dba
     image: adminer
-    restart: always
     ports:
       - 5556:8080
     volumes:
